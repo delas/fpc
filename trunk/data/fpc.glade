@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.2.2 on Fri Jul 13 08:44:44 2007 by delas@godel-->
+<!--Generated with glade3 3.2.2 on Fri Jul 13 14:44:24 2007 by delas@godel-->
 <glade-interface>
   <widget class="GtkWindow" id="fpc">
     <property name="width_request">500</property>
@@ -151,12 +151,13 @@
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                     <child>
-                      <widget class="GtkImageMenuItem" id="imagemenuitem10">
+                      <widget class="GtkImageMenuItem" id="menuItemInfo">
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="label" translatable="yes">gtk-about</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
+                        <signal name="activate" handler="on_menuItemInfo_activate"/>
                       </widget>
                     </child>
                   </widget>
@@ -174,22 +175,24 @@
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <property name="toolbar_style">GTK_TOOLBAR_BOTH</property>
             <child>
-              <widget class="GtkToolButton" id="toolbutton1">
+              <widget class="GtkToolButton" id="toolAdd">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="label" translatable="yes">Aggiungi progetto</property>
                 <property name="stock_id">gtk-add</property>
+                <signal name="clicked" handler="on_toolAdd_clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkToolButton" id="toolbutton2">
+              <widget class="GtkToolButton" id="toolEdit">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="label" translatable="yes">Modifica progetto</property>
                 <property name="stock_id">gtk-edit</property>
+                <signal name="clicked" handler="on_toolEdit_clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -206,11 +209,12 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkToggleToolButton" id="toolbutton4">
+              <widget class="GtkToggleToolButton" id="toolWork">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="label" translatable="yes">Lavora al progetto</property>
                 <property name="stock_id">gtk-apply</property>
+                <signal name="toggled" handler="on_toolWork_toggled"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -228,11 +232,14 @@
             <property name="can_focus">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <child>
-              <widget class="GtkTreeView" id="treeview1">
+              <widget class="GtkTreeView" id="treeProjecsList">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="headers_clickable">True</property>
+                <property name="reorderable">True</property>
+                <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_BOTH</property>
+                <signal name="cursor_changed" handler="on_treeProjecsList_cursor_changed"/>
               </widget>
               <packing>
                 <property name="tab_expand">False</property>
@@ -327,6 +334,7 @@
     </child>
   </widget>
   <widget class="GtkAboutDialog" id="fpcAbout">
+    <property name="visible">True</property>
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Informazioni su Glade</property>
@@ -334,10 +342,16 @@
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="has_separator">False</property>
-    <property name="name">Glade</property>
+    <property name="name">FastProjectCounter</property>
     <property name="version">0.3</property>
+    <property name="comments" translatable="yes">Software per il monitoraggio dei
+tempi di lavoro a molti progetti contemporaneamente.</property>
     <property name="website">http://fpc.sf.net</property>
-    <property name="authors">Andrea Burattin</property>
+    <property name="website_label" translatable="yes">http://fpc.sf.net</property>
+    <property name="license" translatable="yes">GPL</property>
+    <property name="authors">Andrea Burattin &lt;andrea@delas.it&gt;</property>
+    <property name="logo">icon.svg</property>
+    <signal name="response" handler="on_fpcAbout_response"/>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>
