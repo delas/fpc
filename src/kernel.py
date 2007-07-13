@@ -11,17 +11,17 @@ cur = con.cursor()
 
 
 def getAllProjects():
-	cur.execute("SELECT * FROM projects")
+	cur.execute("SELECT *, worked_mins*fee/60 AS total FROM projects ORDER BY name ASC")
 	d = []
 	for idx in cur:
 		d.append(idx)
 	return d
 
 
-def addNewProject(name, worked_mins):
+def addNewProject(name, worked_mins, fee):
 	cur.execute(
-		"INSERT INTO projects (name, worked_mins, work_start_timestamp) VALUES (?, ?, 0)",
-		(name, worked_mins)
+		"INSERT INTO projects (name, worked_mins, work_start_timestamp, fee) VALUES (?, ?, 0, ?)",
+		(name, worked_mins, fee)
 	)
 	cur.execute("SELECT id FROM projects ORDER BY id DESC LIMIT 0, 1")
 	last_insert_id = cur.fetchone()[0]
@@ -30,7 +30,7 @@ def addNewProject(name, worked_mins):
 
 
 def getHeaderProjectTable():
-	return ("ID", "Name", "Worked mins")
+	return (_("ID"), _("Name"), _("Worked mins"), _("Fee"), _("Total"))
 
 
 def toggleWorkOnProjectID(project_id):
