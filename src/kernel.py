@@ -30,6 +30,10 @@ def addNewProject(name, worked_mins):
 	return last_insert_id
 
 
+def getHeaderProjectTable():
+	return ("ID", "Name", "Worked mins")
+
+
 # The possible operation type values are:
 # -1 - project removed
 #  0 - project created
