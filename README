@@ -1,9 +1,14 @@
 FPC README FILE
 ===============
 
-INSTALLATION
-------------
+In order to run FPC, you have to execure the file fpc in the same place of this
+readme file. Be sure that fpc has executing privilege and that data/archive.db
+has read/write privilege.
 
-From /fpc/trunk, exec make install. After this, you shuld be able to run fpc
-from the shell. To uninstall the software go in /fpc/trunk and type make
-uninstall. Both this command must have root privileges.
+You shall also crate a symbolic link to fpc and giving it executing privilege,
+using:
+	# ln -s THIS-README-PATH/fpc /usr/bin/fpc
+	# chmod +x 
+
+Remember also to modify the fpc script, replacing "path/to/directory" with the
+current working directory.
