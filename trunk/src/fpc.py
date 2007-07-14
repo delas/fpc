@@ -18,7 +18,7 @@ from SimpleGladeApp import SimpleGladeApp
 from SimpleGladeApp import bindtextdomain
 
 app_name = "fpc"
-app_version = "0.0.1"
+app_version = "0.0.3"
 
 glade_dir = "../data"
 icon_file = "../data/icon.svg"
@@ -31,289 +31,287 @@ bindtextdomain(app_name, locale_dir)
 
 class Fpc(SimpleGladeApp):
 
-    def __init__(self, path="fpc.glade",
-                root="fpc",
-                domain=app_name, **kwargs):
-        path = os.path.join(glade_dir, path)
-        SimpleGladeApp.__init__(self, path, root, domain, **kwargs)
+	def __init__(self, path="fpc.glade",
+				root="fpc",
+				domain=app_name, **kwargs):
+		path = os.path.join(glade_dir, path)
+		SimpleGladeApp.__init__(self, path, root, domain, **kwargs)
 
-    #-- Fpc.new {
-    def new(self):
-        print "A new %s has been created" % self.__class__.__name__
+	#-- Fpc.new {
+	def new(self):
+		self.fpc.set_icon_from_file(icon_file)
 
-        self.fpc.set_icon_from_file(icon_file)
+		# be sure that all projects are finished
+		kernel.finishAllProjects()
 
-        # be sure that all projects are finished
-        kernel.finishAllProjects()
+		# setup projects list
+		self.reloadProjectsList()
 
-        # setup projects list
-        self.reloadProjectsList()
+		# turn off project related button
+		self.set_edit_button_sensitive(False)
 
-        # turn off project related button
-        self.set_edit_button_sensitive(False)
+		# set status icon
+		self.statusIcon = gtk.StatusIcon()
+		self.statusIcon.set_from_file(icon_file)
+		self.statusIcon.set_tooltip("FastProjectCounter")
+		self.statusIcon.connect('activate', self.on_status_icon_left_clicked)
+		self.statusIcon.connect('popup-menu', self.on_status_icon_right_clicked)
+	#-- Fpc.new }
 
-        # set status icon
-        self.statusIcon = gtk.StatusIcon()
-        self.statusIcon.set_from_file(icon_file)
-        self.statusIcon.set_tooltip("FastProjectCounter")
-        self.statusIcon.connect('activate', self.on_status_icon_left_clicked)
-        self.statusIcon.connect('popup-menu', self.on_status_icon_right_clicked)
-    #-- Fpc.new }
-
-    #-- Fpc custom methods {
+	#-- Fpc custom methods {
 
 
-    def set_edit_button_sensitive(self, sensitive):
-        self.menuRemoveProject.set_sensitive(sensitive)
+	def set_edit_button_sensitive(self, sensitive):
+		self.menuRemoveProject.set_sensitive(sensitive)
 
 
-    def on_status_icon_left_clicked(self, data):
-        self.fpc.show()
+	def on_status_icon_left_clicked(self, data):
+		self.fpc.show()
 
 
-    def on_status_icon_right_clicked(self, widget, button, time):
-        menuStatusIcon.show_all()
-        menuStatusIcon.popup(None, None, gtk.status_icon_position_menu, button, time, self.statusIcon)
+	def on_status_icon_right_clicked(self, widget, button, time):
+		menuStatusIcon.show_all()
+		menuStatusIcon.popup(None, None, gtk.status_icon_position_menu, button, time, self.statusIcon)
 
-    def activate_project(self, widget, *args):
-        kernel.toggleWorkOnProjectID(args[0])
-        self.reloadProjectsList()
-        if kernel.getNumberWorkingProjects()> 0:
-            self.statusIcon.set_from_file(icon_file_working)
-        else:
-            self.statusIcon.set_from_file(icon_file)
+	def activate_project(self, widget, *args):
+		kernel.toggleWorkOnProjectID(args[0])
+		self.reloadProjectsList()
+		if kernel.getNumberWorkingProjects()> 0:
+			self.statusIcon.set_from_file(icon_file_working)
+		else:
+			self.statusIcon.set_from_file(icon_file)
 
 
-    def reloadProjectsList(self):
-        COL_ID, COL_NAME, COL_WORKED_MIN, COL_FEE, COL_PROFIT = (0, 1, 2, 3, 4)
-        model = gtk.ListStore (int, str, int, int, int)
+	def reloadProjectsList(self):
+		COL_ID, COL_NAME, COL_WORKED_MIN, COL_FEE, COL_PROFIT = (0, 1, 2, 3, 4)
+		model = gtk.ListStore (int, str, int, int, int)
 
-        self.treeProjecsList.set_model(model)
-        self.treeProjecsList.set_rules_hint(True)
+		self.treeProjecsList.set_model(model)
+		self.treeProjecsList.set_rules_hint(True)
 
-        # clear the treeview before inserting new columns
-        if len(self.treeProjecsList.get_columns()) > 0:
-            for column in self.treeProjecsList.get_columns():
-                self.treeProjecsList.remove_column(column)
+		# clear the treeview before inserting new columns
+		if len(self.treeProjecsList.get_columns()) > 0:
+			for column in self.treeProjecsList.get_columns():
+				self.treeProjecsList.remove_column(column)
 
-        # column setup
-        cell = gtk.CellRendererText ()
-        column = gtk.TreeViewColumn (_("ID"), cell, text = COL_ID)
-        self.treeProjecsList.append_column(column)
-        column.set_sort_column_id(COL_ID)
-        column = gtk.TreeViewColumn (_("Project Name"), cell, text = COL_NAME)
-        self.treeProjecsList.append_column(column)
-        column.set_sort_column_id(COL_NAME)
-        column.set_expand(True)
-        column = gtk.TreeViewColumn (_("Worked hours"), cell, text = COL_WORKED_MIN)
-        self.treeProjecsList.append_column(column)
-        column.set_sort_column_id(COL_WORKED_MIN)
-        column = gtk.TreeViewColumn (_("Fee"), cell, text = COL_FEE)
-        self.treeProjecsList.append_column(column)
-        column.set_sort_column_id(COL_FEE)
-        column = gtk.TreeViewColumn (_("Total profit"), cell, text = COL_PROFIT)
-        self.treeProjecsList.append_column(column)
-        column.set_sort_column_id(COL_PROFIT)
+		# column setup
+		cell = gtk.CellRendererText ()
+		column = gtk.TreeViewColumn (_("ID"), cell, text = COL_ID)
+		self.treeProjecsList.append_column(column)
+		column.set_sort_column_id(COL_ID)
+		column = gtk.TreeViewColumn (_("Project Name"), cell, text = COL_NAME)
+		self.treeProjecsList.append_column(column)
+		column.set_sort_column_id(COL_NAME)
+		column.set_expand(True)
+		column = gtk.TreeViewColumn (_("Worked hours"), cell, text = COL_WORKED_MIN)
+		self.treeProjecsList.append_column(column)
+		column.set_sort_column_id(COL_WORKED_MIN)
+		column = gtk.TreeViewColumn (_("Fee"), cell, text = COL_FEE)
+		self.treeProjecsList.append_column(column)
+		column.set_sort_column_id(COL_FEE)
+		column = gtk.TreeViewColumn (_("Total profit"), cell, text = COL_PROFIT)
+		self.treeProjecsList.append_column(column)
+		column.set_sort_column_id(COL_PROFIT)
 
-        # project elements setup
-        for project in kernel.getAllProjects():
-            iter = model.append([
-                project[0],
-                project[1],
-                (project[2]/60),
-                project[4],
-                project[5]
-                ])
+		# project elements setup
+		for project in kernel.getAllProjects():
+			iter = model.append([
+				project[0],
+				project[1],
+				(project[2]/60),
+				project[4],
+				project[5]
+				])
 
-        # turn off all selection button
-        self.set_edit_button_sensitive(False)
+		# turn off all selection button
+		self.set_edit_button_sensitive(False)
 
-        # statusicon menu
-        for gtk_menubar_item in menuStatusIcon.get_children():
-            gtk_menubar_item.destroy()
-        for project in kernel.getAllProjects():
-            menuItem = gtk.CheckMenuItem(project[1])
-            menuItem.set_active(project[3] != 0)
-            menuItem.connect("toggled", self.activate_project, project[0])
-            menuStatusIcon.append(menuItem)
-        separator = gtk.SeparatorMenuItem()
-        menuStatusIcon.append(separator)
-        menuItem = gtk.ImageMenuItem(gtk.STOCK_QUIT)
-        menuItem.connect("activate", self.on_fpc_destroy)
-        menuStatusIcon.append(menuItem)
+		# statusicon menu
+		for gtk_menubar_item in menuStatusIcon.get_children():
+			gtk_menubar_item.destroy()
+		for project in kernel.getAllProjects():
+			menuItem = gtk.CheckMenuItem(project[1])
+			menuItem.set_active(project[3] != 0)
+			menuItem.connect("toggled", self.activate_project, project[0])
+			menuStatusIcon.append(menuItem)
+		separator = gtk.SeparatorMenuItem()
+		menuStatusIcon.append(separator)
+		menuItem = gtk.ImageMenuItem(gtk.STOCK_QUIT)
+		menuItem.connect("activate", self.on_fpc_destroy)
+		menuStatusIcon.append(menuItem)
 
 
 
 
-    def reloadLogList(self):
-        COL_PROJECT, COL_OPERATION, COL_TIME = (0, 1, 2)
-        model = gtk.ListStore (str, str, str)
+	def reloadLogList(self):
+		COL_PROJECT, COL_OPERATION, COL_TIME = (0, 1, 2)
+		model = gtk.ListStore (str, str, str)
 
-        self.treeLogs.set_model(model)
-        self.treeLogs.set_rules_hint(True)
+		self.treeLogs.set_model(model)
+		self.treeLogs.set_rules_hint(True)
 
-        # clear the treeview before inserting new columns
-        if len(self.treeLogs.get_columns()) > 0:
-            for column in self.treeLogs.get_columns():
-                self.treeLogs.remove_column(column)
+		# clear the treeview before inserting new columns
+		if len(self.treeLogs.get_columns()) > 0:
+			for column in self.treeLogs.get_columns():
+				self.treeLogs.remove_column(column)
 
-        # column setup
-        cell = gtk.CellRendererText ()
-        column = gtk.TreeViewColumn (_("Project Name"), cell, text = COL_PROJECT)
-        self.treeLogs.append_column(column)
-        column.set_expand(True)
-        column = gtk.TreeViewColumn (_("Operation"), cell, text = COL_OPERATION)
-        self.treeLogs.append_column(column)
-        column = gtk.TreeViewColumn (_("Date and time"), cell, text = COL_TIME)
-        self.treeLogs.append_column(column)
+		# column setup
+		cell = gtk.CellRendererText ()
+		column = gtk.TreeViewColumn (_("Project Name"), cell, text = COL_PROJECT)
+		self.treeLogs.append_column(column)
+		column.set_expand(True)
+		column = gtk.TreeViewColumn (_("Operation"), cell, text = COL_OPERATION)
+		self.treeLogs.append_column(column)
+		column = gtk.TreeViewColumn (_("Date and time"), cell, text = COL_TIME)
+		self.treeLogs.append_column(column)
 
-        # project elements setup
-        for project in kernel.getAllLogs():
-            iter = model.append([
-                project[2],
-                kernel.fromIntToOperationType(project[0]),
-                time.ctime(project[1])
-                ])
+		# project elements setup
+		for project in kernel.getAllLogs():
+			iter = model.append([
+				project[2],
+				kernel.fromIntToOperationType(project[0]),
+				time.ctime(project[1])
+				])
 
 
-    #-- Fpc custom methods }
+	#-- Fpc custom methods }
 
-    #-- Fpc.on_fpc_destroy {
-    def on_fpc_destroy(self, widget, *args):
-        # finish all started projects
-        kernel.finishAllProjects()
+	#-- Fpc.on_fpc_destroy {
+	def on_fpc_destroy(self, widget, *args):
+		# finish all started projects
+		kernel.finishAllProjects()
 
-        self.gtk_main_quit()
-    #-- Fpc.on_fpc_destroy }
+		self.gtk_main_quit()
+	#-- Fpc.on_fpc_destroy }
 
-    #-- Fpc.on_fpc_delete_event {
-    def on_fpc_delete_event(self, widget, *args):
-        self.fpc.hide()
-        return True
-    #-- Fpc.on_fpc_delete_event }
+	#-- Fpc.on_fpc_delete_event {
+	def on_fpc_delete_event(self, widget, *args):
+		self.fpc.hide()
+		return True
+	#-- Fpc.on_fpc_delete_event }
 
-    #-- Fpc.on_menuHide_activate {
-    def on_menuHide_activate(self, widget, *args):
-        self.fpc.hide()
-    #-- Fpc.on_menuHide_activate }
+	#-- Fpc.on_menuHide_activate {
+	def on_menuHide_activate(self, widget, *args):
+		self.fpc.hide()
+	#-- Fpc.on_menuHide_activate }
 
-    #-- Fpc.on_menuQuit_activate {
-    def on_menuQuit_activate(self, widget, *args):
-        self.on_fpc_destroy(self, widget, *args)
-    #-- Fpc.on_menuQuit_activate }
+	#-- Fpc.on_menuQuit_activate {
+	def on_menuQuit_activate(self, widget, *args):
+		self.on_fpc_destroy(self, widget, *args)
+	#-- Fpc.on_menuQuit_activate }
 
-    #-- Fpc.on_menuNewProject_activate {
-    def on_menuNewProject_activate(self, widget, *args):
-        window = Fpcaddproject()
-        window.setOpener(self)
-    #-- Fpc.on_menuNewProject_activate }
+	#-- Fpc.on_menuNewProject_activate {
+	def on_menuNewProject_activate(self, widget, *args):
+		window = Fpcaddproject()
+		window.setOpener(self)
+	#-- Fpc.on_menuNewProject_activate }
 
-    #-- Fpc.on_menuRemoveProject_activate {
-    def on_menuRemoveProject_activate(self, widget, *args):
-        iter = self.treeProjecsList.get_selection().get_selected()[1]
-        project_id = self.treeProjecsList.get_model().get_value(iter, 0)
-        kernel.removeProject(project_id)
-        self.reloadProjectsList()
-    #-- Fpc.on_menuRemoveProject_activate }
+	#-- Fpc.on_menuRemoveProject_activate {
+	def on_menuRemoveProject_activate(self, widget, *args):
+		iter = self.treeProjecsList.get_selection().get_selected()[1]
+		project_id = self.treeProjecsList.get_model().get_value(iter, 0)
+		kernel.removeProject(project_id)
+		self.reloadProjectsList()
+	#-- Fpc.on_menuRemoveProject_activate }
 
-    #-- Fpc.on_menuAbout_activate {
-    def on_menuAbout_activate(self, widget, *args):
-        Fpcabout()
-    #-- Fpc.on_menuAbout_activate }
+	#-- Fpc.on_menuAbout_activate {
+	def on_menuAbout_activate(self, widget, *args):
+		Fpcabout()
+	#-- Fpc.on_menuAbout_activate }
 
-    #-- Fpc.on_toolAdd_clicked {
-    def on_toolAdd_clicked(self, widget, *args):
-        window = Fpcaddproject()
-        window.setOpener(self)
-    #-- Fpc.on_toolAdd_clicked }
+	#-- Fpc.on_toolAdd_clicked {
+	def on_toolAdd_clicked(self, widget, *args):
+		window = Fpcaddproject()
+		window.setOpener(self)
+	#-- Fpc.on_toolAdd_clicked }
 
-    #-- Fpc.on_treeProjecsList_cursor_changed {
-    def on_treeProjecsList_cursor_changed(self, widget, *args):
-        self.set_edit_button_sensitive(True)
-    #-- Fpc.on_treeProjecsList_cursor_changed }
+	#-- Fpc.on_treeProjecsList_cursor_changed {
+	def on_treeProjecsList_cursor_changed(self, widget, *args):
+		self.set_edit_button_sensitive(True)
+	#-- Fpc.on_treeProjecsList_cursor_changed }
 
-    #-- Fpc.on_buttonUpdateLog_clicked {
-    def on_buttonUpdateLog_clicked(self, widget, *args):
-        self.reloadLogList()
-    #-- Fpc.on_buttonUpdateLog_clicked }
+	#-- Fpc.on_buttonUpdateLog_clicked {
+	def on_buttonUpdateLog_clicked(self, widget, *args):
+		self.reloadLogList()
+	#-- Fpc.on_buttonUpdateLog_clicked }
 
 
 class Fpcabout(SimpleGladeApp):
 
-    def __init__(self, path="fpc.glade",
-                root="fpcAbout",
-                domain=app_name, **kwargs):
-        path = os.path.join(glade_dir, path)
-        SimpleGladeApp.__init__(self, path, root, domain, **kwargs)
+	def __init__(self, path="fpc.glade",
+				root="fpcAbout",
+				domain=app_name, **kwargs):
+		path = os.path.join(glade_dir, path)
+		SimpleGladeApp.__init__(self, path, root, domain, **kwargs)
 
-    #-- Fpcabout.new {
-    def new(self):
-        print "A new %s has been created" % self.__class__.__name__
-    #-- Fpcabout.new }
+	#-- Fpcabout.new {
+	def new(self):
+		return True
+	#-- Fpcabout.new }
 
-    #-- Fpcabout custom methods {
-    #   Write your own methods here
-    #-- Fpcabout custom methods }
+	#-- Fpcabout custom methods {
+	#   Write your own methods here
+	#-- Fpcabout custom methods }
 
-    #-- Fpcabout.on_fpcAbout_response {
-    def on_fpcAbout_response(self, widget, *args):
-        widget.destroy()
-    #-- Fpcabout.on_fpcAbout_response }
+	#-- Fpcabout.on_fpcAbout_response {
+	def on_fpcAbout_response(self, widget, *args):
+		widget.destroy()
+	#-- Fpcabout.on_fpcAbout_response }
 
 
 class Fpcaddproject(SimpleGladeApp):
 
-    def __init__(self, path="fpc.glade",
-                root="fpcAddProject",
-                domain=app_name, **kwargs):
-        path = os.path.join(glade_dir, path)
-        SimpleGladeApp.__init__(self, path, root, domain, **kwargs)
+	def __init__(self, path="fpc.glade",
+				root="fpcAddProject",
+				domain=app_name, **kwargs):
+		path = os.path.join(glade_dir, path)
+		SimpleGladeApp.__init__(self, path, root, domain, **kwargs)
 
-    #-- Fpcaddproject.new {
-    def new(self):
-        print "A new %s has been created" % self.__class__.__name__
-    #-- Fpcaddproject.new }
+	#-- Fpcaddproject.new {
+	def new(self):
+		return True
+	#-- Fpcaddproject.new }
 
-    #-- Fpcaddproject custom methods {
-    def setOpener(self, o):
-        self.opener = o
-    #-- Fpcaddproject custom methods }
+	#-- Fpcaddproject custom methods {
+	def setOpener(self, o):
+		self.opener = o
+	#-- Fpcaddproject custom methods }
 
-    #-- Fpcaddproject.on_buttonClose_clicked {
-    def on_buttonClose_clicked(self, widget, *args):
-        self.fpcAddProject.destroy()
-    #-- Fpcaddproject.on_buttonClose_clicked }
+	#-- Fpcaddproject.on_buttonClose_clicked {
+	def on_buttonClose_clicked(self, widget, *args):
+		self.fpcAddProject.destroy()
+	#-- Fpcaddproject.on_buttonClose_clicked }
 
-    #-- Fpcaddproject.on_buttonApply_clicked {
-    def on_buttonApply_clicked(self, widget, *args):
-        if (
-            (len(self.entryProjectName.get_text()) > 0)
-        ):
-            kernel.addNewProject(
-                self.entryProjectName.get_text(),
-                self.entryWorkedMins.get_value(),
-                self.entryFee.get_value()
-                )
-            self.fpcAddProject.destroy()
-        else:
-            dialog  = gtk.MessageDialog(None, gtk.DIALOG_MODAL |
-                gtk.DIALOG_DESTROY_WITH_PARENT,gtk.MESSAGE_ERROR, gtk.BUTTONS_OK,
-                _("Prego inserire tutti i dati correttamente!"))
-            dialog.set_title("FPC - " + _("Errore"))
-            dialog.run()
-            dialog.destroy()
-        self.opener.reloadProjectsList()
-    #-- Fpcaddproject.on_buttonApply_clicked }
+	#-- Fpcaddproject.on_buttonApply_clicked {
+	def on_buttonApply_clicked(self, widget, *args):
+		if (
+			(len(self.entryProjectName.get_text()) > 0)
+		):
+			kernel.addNewProject(
+				self.entryProjectName.get_text(),
+				self.entryWorkedMins.get_value(),
+				self.entryFee.get_value()
+				)
+			self.fpcAddProject.destroy()
+		else:
+			dialog  = gtk.MessageDialog(None, gtk.DIALOG_MODAL |
+				gtk.DIALOG_DESTROY_WITH_PARENT,gtk.MESSAGE_ERROR, gtk.BUTTONS_OK,
+				_("Prego inserire tutti i dati correttamente!"))
+			dialog.set_title("FPC - " + _("Errore"))
+			dialog.run()
+			dialog.destroy()
+		self.opener.reloadProjectsList()
+	#-- Fpcaddproject.on_buttonApply_clicked }
 
 
 #-- main {
 
 def main():
-    fpc = Fpc()
+	fpc = Fpc()
 
-    fpc.run()
+	fpc.run()
 
 if __name__ == "__main__":
-    main()
+	main()
 
 #-- main }
