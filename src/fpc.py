@@ -8,6 +8,14 @@
 # Warning: Do not modify any context comment such as #--
 # They are required to keep user's code
 
+import sys
+import __init__
+
+# adjusting application path
+if len(sys.argv) == 2 :
+	# second parameter MUST be the app path
+	__init__.app_path = sys.argv[1]
+
 import os
 import gtk
 import kernel
@@ -20,13 +28,12 @@ from SimpleGladeApp import bindtextdomain
 app_name = "fpc"
 app_version = "0.0.3"
 
-glade_dir = "../data"
-icon_file = "../data/icon.svg"
-icon_file_working = "../data/icon_working.svg"
-locale_dir = ""
+glade_dir = "/../data"
+icon_file = "/../data/icon.svg"
+icon_file_working = "/../data/icon_working.svg"
 menuStatusIcon = gtk.Menu()
 
-bindtextdomain(app_name, locale_dir)
+bindtextdomain(app_name, __init__.app_path)
 
 
 class Fpc(SimpleGladeApp):
@@ -34,12 +41,12 @@ class Fpc(SimpleGladeApp):
 	def __init__(self, path="fpc.glade",
 				root="fpc",
 				domain=app_name, **kwargs):
-		path = os.path.join(glade_dir, path)
+		path = os.path.join(__init__.app_path + glade_dir, path)
 		SimpleGladeApp.__init__(self, path, root, domain, **kwargs)
 
 	#-- Fpc.new {
 	def new(self):
-		self.fpc.set_icon_from_file(icon_file)
+		self.fpc.set_icon_from_file(__init__.app_path + icon_file)
 
 		# be sure that all projects are finished
 		kernel.finishAllProjects()
@@ -52,7 +59,7 @@ class Fpc(SimpleGladeApp):
 
 		# set status icon
 		self.statusIcon = gtk.StatusIcon()
-		self.statusIcon.set_from_file(icon_file)
+		self.statusIcon.set_from_file(__init__.app_path + icon_file)
 		self.statusIcon.set_tooltip("FastProjectCounter")
 		self.statusIcon.connect('activate', self.on_status_icon_left_clicked)
 		self.statusIcon.connect('popup-menu', self.on_status_icon_right_clicked)
@@ -77,9 +84,9 @@ class Fpc(SimpleGladeApp):
 		kernel.toggleWorkOnProjectID(args[0])
 		self.reloadProjectsList()
 		if kernel.getNumberWorkingProjects()> 0:
-			self.statusIcon.set_from_file(icon_file_working)
+			self.statusIcon.set_from_file(__init__.app_path + icon_file_working)
 		else:
-			self.statusIcon.set_from_file(icon_file)
+			self.statusIcon.set_from_file(__init__.app_path + icon_file)
 
 
 	def reloadProjectsList(self):
@@ -241,7 +248,7 @@ class Fpcabout(SimpleGladeApp):
 	def __init__(self, path="fpc.glade",
 				root="fpcAbout",
 				domain=app_name, **kwargs):
-		path = os.path.join(glade_dir, path)
+		path = os.path.join(__init__.app_path + glade_dir, path)
 		SimpleGladeApp.__init__(self, path, root, domain, **kwargs)
 
 	#-- Fpcabout.new {
@@ -264,7 +271,7 @@ class Fpcaddproject(SimpleGladeApp):
 	def __init__(self, path="fpc.glade",
 				root="fpcAddProject",
 				domain=app_name, **kwargs):
-		path = os.path.join(glade_dir, path)
+		path = os.path.join(__init__.app_path + glade_dir, path)
 		SimpleGladeApp.__init__(self, path, root, domain, **kwargs)
 
 	#-- Fpcaddproject.new {
@@ -307,8 +314,11 @@ class Fpcaddproject(SimpleGladeApp):
 #-- main {
 
 def main():
-	fpc = Fpc()
+	if len(sys.argv) == 2 :
+		# second parameter MUST be the app path
+		__init__.app_path = sys.argv[1]
 
+	fpc = Fpc()
 	fpc.run()
 
 if __name__ == "__main__":

@@ -1,13 +1,11 @@
 from pysqlite2 import dbapi2 as sqlite
 import time
+import __init__
 
-# Si connette al database se esiste, se non esiste ne crea uno nuovo
-# con il nome indicato (nello stesso percorso del sorgente pysql.py)
-con = sqlite.connect("../data/archive.db", isolation_level = None)
+db_file = "/../data/archive.db"
 
-# Crea un cursore che segue la connessione
+con = sqlite.connect(__init__.app_path + db_file, isolation_level = None)
 cur = con.cursor()
-
 
 
 def getAllProjects():
@@ -19,7 +17,7 @@ def getAllProjects():
 
 
 def getAllLogs():
-	cur.execute("SELECT logs.operation_type, logs.time, projects.name FROM logs, projects WHERE logs.project_id=projects.id ORDER BY logs.time DESC")
+	cur.execute("SELECT logs.operation_type, logs.time, projects.name FROM logs, projects WHERE logs.project_id= projects.id ORDER BY logs.time DESC")
 	d = []
 	for idx in cur:
 		d.append(idx)
