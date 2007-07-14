@@ -1,0 +1,9 @@
+FPC README FILE
+===============
+
+INSTALLATION
+------------
+
+From /fpc/trunk, exec make install. After this, you shuld be able to run fpc
+from the shell. To uninstall the software go in /fpc/trunk and type make
+uninstall. Both this command must have root privileges.
