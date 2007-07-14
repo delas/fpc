@@ -1,2 +1,2 @@
 #!/bin/bash
-./path/to/script/src/fpc.py /path/to/script/src
+/home/delas/fpc/trunk/src/fpc.py /home/delas/fpc/trunk/src
