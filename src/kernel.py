@@ -11,7 +11,15 @@ cur = con.cursor()
 
 
 def getAllProjects():
-	cur.execute("SELECT *, worked_mins*fee/60 AS total FROM projects ORDER BY name ASC")
+	cur.execute("SELECT *, (worked_mins/60*fee) AS total FROM projects ORDER BY name ASC")
+	d = []
+	for idx in cur:
+		d.append(idx)
+	return d
+
+
+def getAllLogs():
+	cur.execute("SELECT logs.operation_type, logs.time, projects.name FROM logs, projects WHERE logs.project_id=projects.id ORDER BY logs.time DESC")
 	d = []
 	for idx in cur:
 		d.append(idx)
@@ -29,8 +37,14 @@ def addNewProject(name, worked_mins, fee):
 	return last_insert_id
 
 
-def getHeaderProjectTable():
-	return (_("ID"), _("Name"), _("Worked mins"), _("Fee"), _("Total"))
+def removeProject(project_id):
+	cur.execute("DELETE FROM projects WHERE id = ?", (project_id,))
+	cur.execute("DELETE FROM logs WHERE project_id = ?", (project_id,))
+
+
+def getNumberWorkingProjects():
+	cur.execute("SELECT COUNT(*) AS total FROM projects WHERE work_start_timestamp>0")
+	return cur.fetchone()[0]
 
 
 def toggleWorkOnProjectID(project_id):
@@ -58,7 +72,7 @@ def finishAllProjects():
 
 
 # The possible operation type values are:
-# -1 - project removed
+# -1 - project removed -- not used
 #  0 - project created
 #  1 - start working
 #  2 - stop working
@@ -68,3 +82,14 @@ def addLog(project_id, operation_type):
 		"INSERT INTO logs (project_id, operation_type, time) VALUES (?, ?, ?)",
 		(project_id, operation_type, time.time())
 	)
+
+
+def fromIntToOperationType(op_id):
+	if op_id == -1:
+		return _("Project removed")
+	if op_id == 0:
+		return _("Project created")
+	if op_id == 1:
+		return _("Start working")
+	if op_id == 2:
+		return _("Work finished")
