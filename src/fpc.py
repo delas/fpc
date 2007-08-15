@@ -134,13 +134,26 @@ class Fpc(SimpleGladeApp):
 		self.set_edit_button_sensitive(False)
 
 		# statusicon menu
+		# destroy old menu
 		for gtk_menubar_item in menuStatusIcon.get_children():
 			gtk_menubar_item.destroy()
+
+		# show window
+		menuItem = gtk.ImageMenuItem(_("Show window"))
+		img = gtk.Image()
+		img.set_from_stock(gtk.STOCK_ZOOM_FIT, gtk.ICON_SIZE_MENU)
+		menuItem.set_image(img)
+		menuItem.connect("activate", self.on_status_icon_left_clicked)
+		menuStatusIcon.append(menuItem)
+		separator = gtk.SeparatorMenuItem()
+		menuStatusIcon.append(separator)
+		# projects list
 		for project in kernel.getAllProjects():
 			menuItem = gtk.CheckMenuItem(project[1])
 			menuItem.set_active(project[3] != 0)
 			menuItem.connect("toggled", self.activate_project, project[0])
 			menuStatusIcon.append(menuItem)
+		# close windows
 		separator = gtk.SeparatorMenuItem()
 		menuStatusIcon.append(separator)
 		menuItem = gtk.ImageMenuItem(gtk.STOCK_QUIT)
