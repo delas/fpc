@@ -5,7 +5,7 @@ In order to run FPC, you have to execure the file fpc in the same place of this
 readme file. Be sure that fpc has executing privilege and that data/archive.db
 has read/write privilege.
 
-You shall also crate a symbolic link to fpc and giving it executing privilege,
+You shall also crate a symbolic link to fpc and give it executing privilege,
 using:
 	# ln -s THIS-README-PATH/fpc /usr/bin/fpc
 	# chmod +x 
